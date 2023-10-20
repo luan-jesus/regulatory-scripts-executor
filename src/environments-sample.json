@@ -1,0 +1,74 @@
+[
+  {
+    "id": "1a50305",
+    "name": "voxcred",
+    "databases": [
+      {
+        "serviceName": "service-web-arquivo-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/arquivo",
+        "dbUser": "arquivo_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-auditoria-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/auditoria",
+        "dbUser": "auditoria_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-autenticacao-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/autenticacao",
+        "dbUser": "autenticacao_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-contabilizador-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/contabilizador",
+        "dbUser": "contabilizador_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-gerencial-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/gerencial",
+        "dbUser": "gerencial_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-importador-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/importador",
+        "dbUser": "importador_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-integrador-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/integrador",
+        "dbUser": "integrador_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-movimentacao-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/movimentacao",
+        "dbUser": "movimentacao_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-parametro-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/parametro",
+        "dbUser": "parametro_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-rotina-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/rotina",
+        "dbUser": "rotina_user",
+        "dbPassword": "dbPassword"
+      },
+      {
+        "serviceName": "service-web-saldo-1",
+        "dbUrl": "jdbc:postgresql://dbhost:5432/saldo",
+        "dbUser": "saldo_user",
+        "dbPassword": "dbPassword"
+      }
+    ]
+  }
+]
