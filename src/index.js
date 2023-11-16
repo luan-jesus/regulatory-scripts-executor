@@ -1,11 +1,28 @@
 const { Client } = require("pg");
+const fs = require('fs');
+
+// Params
+const SERVICE = "autenticacao";
+const QUERY = `
+select tu.id, tu.nome, login, email, date(data_ultima_alteracao_senha) + 90 data_expiracao_senha, tg.nome "role", tu.status from autenticacao.t_usuario tu
+join autenticacao.t_usuario_grupo tug on tug.id_usuario = tu.id 
+join autenticacao.t_grupo tg on tg.id = tug.id_grupo
+order by id asc;
+`;
+const OUTPUT_DIR = "./files";
+const OUTPUT_FILE_NAME = "all-environment-users-2023-11-16";
+const WRITE_RESPONSE_TO_FILE = true;
+const CSV_DELIMITER = ";";
+
+var isHeaderWritten = false;
 
 async function main() {
   const environments = require("./environments.json");
+  const file = `${OUTPUT_DIR}/${OUTPUT_FILE_NAME}-${new Date().getTime()}.csv`;
 
   for (const environment of environments) {
     for (const service of environment.databases) {
-      if (service.serviceName.includes("rotina")) {
+      if (service.serviceName.includes(SERVICE)) {
         try {
           const url = service.dbUrl.split("//")[1].split(":")[0];
           const port = service.dbUrl.split("//")[1].split(":")[1].split("/")[0];
@@ -14,12 +31,6 @@ async function main() {
             .split(":")[1]
             .split("/")[1];
 
-          const query = `
-          CREATE INDEX IF NOT EXISTS t_detalhamento_rotina_id_rotina_idx ON rotina.t_detalhamento_rotina (id_rotina);
-
-          CREATE INDEX IF NOT EXISTS t_rotina_tipo_idx ON rotina.t_rotina (tipo,status);
-          `;
-
           await runQuery(
             {
               url: url,
@@ -27,8 +38,10 @@ async function main() {
               database: database,
               user: service.dbUser,
               password: service.dbPassword,
+              environmentName: environment.name,
+              file: file
             },
-            query
+            QUERY
           );
         } catch (ex) {
           if (ex instanceof Error) {
@@ -40,7 +53,7 @@ async function main() {
   }
 }
 
-async function runQuery({ url, port, database, user, password }, query) {
+async function runQuery({ url, port, database, user, password, environmentName, file }, query) {
   const client = new Client({
     host: url,
     port: port,
@@ -56,7 +69,11 @@ async function runQuery({ url, port, database, user, password }, query) {
 
     console.log(`database: ${url}, executing query`);
 
-    await client.query(query);
+    const response = await client.query(query);
+
+    if (WRITE_RESPONSE_TO_FILE) {
+      writeToFile(file, response, environmentName);
+    }
 
     console.log(`query executed successfully, committing.`);
     await client.query("COMMIT");
@@ -66,6 +83,49 @@ async function runQuery({ url, port, database, user, password }, query) {
     throw ex;
   } finally {
     await client.end();
+  }
+}
+
+function writeToFile(file, response, environmentName) {
+  try {
+    console.log(`Writing response to file: ${file}`);
+
+    if (!fs.existsSync(OUTPUT_DIR)){
+      fs.mkdirSync(OUTPUT_DIR);
+    }
+
+    if (!isHeaderWritten) {
+      let header = "";
+      for (const field of response.fields) {
+        header += field?.name;
+        header += CSV_DELIMITER;
+      }
+      header += "ambiente";
+      header += "\n";
+  
+      fs.writeFileSync(file, header);
+
+      isHeaderWritten = true;
+    }
+
+
+    for (const item of response.rows) {
+      let content = "";
+
+      for (const property in item) {
+        content += JSON.stringify(item[property]);
+        content += CSV_DELIMITER;
+      }
+
+      content += environmentName;
+      content += "\n";
+
+      fs.appendFileSync(file, content);
+    }
+
+  } catch (ex) {
+    console.error(ex);
+    throw ex;
   }
 }
 
