@@ -2,15 +2,13 @@ const { Client } = require("pg");
 const fs = require('fs');
 
 // Params
-const SERVICE = "autenticacao";
+const SERVICE = "auditoria";
 const QUERY = `
-select tu.id, tu.nome, login, email, date(data_ultima_alteracao_senha) + 90 data_expiracao_senha, tg.nome "role", tu.status from autenticacao.t_usuario tu
-join autenticacao.t_usuario_grupo tug on tug.id_usuario = tu.id 
-join autenticacao.t_grupo tg on tg.id = tug.id_grupo
-order by id asc;
+select * from auditoria.t_auditoria
+where data_referencia >= '2025-01-15' and status = 'ALERTA'
 `;
 const OUTPUT_DIR = "./files";
-const OUTPUT_FILE_NAME = "all-environment-users-2023-11-16";
+const OUTPUT_FILE_NAME = "auditorias-15-pra-frente";
 const WRITE_RESPONSE_TO_FILE = true;
 const CSV_DELIMITER = ";";
 
@@ -60,6 +58,10 @@ async function runQuery({ url, port, database, user, password, environmentName, 
     user: user,
     password: password,
     database: database,
+    ssl: {
+      require: false,
+      rejectUnauthorized: false
+    }
   });
 
   await client.connect();
