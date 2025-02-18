@@ -2,13 +2,30 @@ const { Client } = require("pg");
 const fs = require('fs');
 
 // Params
-const SERVICE = "auditoria";
+const SERVICE = "autenticacao";
 const QUERY = `
-select * from auditoria.t_auditoria
-where data_referencia >= '2025-01-15' and status = 'ALERTA'
+select
+	tu.id,
+	tu.nome,
+	tu.email,
+	tu.login,
+	tu.data_ultima_alteracao_senha + interval '90' day ultimo_possivel_acesso,
+	tu.data_ultima_alteracao_senha,
+	tu.status,
+	tg.nome permissao
+from
+	autenticacao.t_usuario tu
+join autenticacao.t_usuario_grupo tug on
+	tug.id_usuario = tu.id
+join autenticacao.t_grupo tg on
+	tg.id = tug.id_grupo
+where
+	tu.id not in (1, 2)
+order by
+	tu.status, tu.data_ultima_alteracao_senha
 `;
 const OUTPUT_DIR = "./files";
-const OUTPUT_FILE_NAME = "auditorias-15-pra-frente";
+const OUTPUT_FILE_NAME = "levantamento_usuarios_julius";
 const WRITE_RESPONSE_TO_FILE = true;
 const CSV_DELIMITER = ";";
 
